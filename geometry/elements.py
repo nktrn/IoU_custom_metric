@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 import numpy as np
 
 
@@ -9,9 +9,6 @@ class Point:
 
     def __eq__(self, other) -> bool:
         return self.x == other.x and self.y == other.y
-
-    def __str__(self) -> str:
-        return f'x: {self.x}, y: {self.y}'
 
     def get_theta(self, centroid: 'Point') -> float:
         y = self.y - centroid.y
@@ -28,13 +25,13 @@ class Line:
         self.start = start
         self.end = end
 
-    def __str__(self) -> str:
-        return f'start:  {self.start};  end: {self.end}'
+    def euclidean_distance(self, p1: Point, p2: Point) -> float:
+        return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
 
     def contains_point(self, p: Point) -> bool:
-        dist1 = euclidean_distance(self.start, p)
-        dist2 = euclidean_distance(p, self.end)
-        line_dist = euclidean_distance(self.start, self.end)
+        dist1 = self.euclidean_distance(self.start, p)
+        dist2 = self.euclidean_distance(p, self.end)
+        line_dist = self.euclidean_distance(self.start, self.end)
         return np.allclose(line_dist, dist1 + dist2, 1e-5)
 
     def x_diff(self) -> float:
@@ -89,32 +86,3 @@ class Polygon:
             for edge in self.get_edges()
         ]
         return all(edges)
-
-
-def is_collinear(line1: Line, line2: Line) -> bool:
-    val = line1.x_diff() * line2.y_diff() - line1.y_diff() * line2.x_diff()
-    return np.round(val, 3) == 0
-
-
-def intersection(line1: Line, line2: Line) -> Optional[Point]:
-    if is_collinear(line1, line2):
-        return None
-
-    x = ((line1.start.x * line1.end.y - line1.start.y * line1.end.x) * line2.x_diff() -
-         line1.x_diff() * (line2.start.x * line2.end.y - line2.start.y * line2.end.x)) / \
-        (line1.x_diff() * line2.y_diff() - line1.y_diff() * line2.x_diff())
-
-    y = ((line1.start.x * line1.end.y - line1.start.y * line1.end.x) * line2.y_diff() -
-         line1.y_diff() * (line2.start.x * line2.end.y - line2.start.y * line2.end.x)) / \
-        (line1.x_diff() * line2.y_diff() - line1.y_diff() * line2.x_diff())
-
-    point_intersection = Point(x, y)
-
-    if (not line1.contains_point(point_intersection)) or (not line2.contains_point(point_intersection)):
-        return None
-
-    return Point(x, y)
-
-
-def euclidean_distance(p1: Point, p2: Point) -> float:
-    return np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)

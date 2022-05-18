@@ -1,6 +1,7 @@
 from itertools import product
 
-from geometry import Polygon, intersection
+from geometry.elements import Polygon
+from geometry.la import intersection
 
 
 def iou(true_polygon: Polygon, predict_polygon: Polygon) -> float:
